@@ -13,15 +13,21 @@ const products = ref<Product[]>([
 
 ])
 
-const { data } = await useFetch('http://e-commerce-laravel.test/api/v1/products/')
+const { data } = await useFetch('/products/', {
+  baseURL: useRuntimeConfig().public.apiBase,
+})
 products.value = data.value.data
 
 // Fetch categories from API
-const { data: categoriesData } = await useFetch('http://e-commerce-laravel.test/api/v1/categories/')
+const { data: categoriesData } = await useFetch('/categories/', {
+  baseURL: useRuntimeConfig().public.apiBase,
+})
 const categories = computed(() => categoriesData.value?.data || [])
 
 // Fetch brands from API
-const { data: brandsData } = await useFetch('http://e-commerce-laravel.test/api/v1/brands')
+const { data: brandsData } = await useFetch('/brands', {
+  baseURL: useRuntimeConfig().public.apiBase,
+})
 const brands = computed(() => brandsData.value?.data || [])
 
 // Pagination
