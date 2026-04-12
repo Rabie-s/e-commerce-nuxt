@@ -1,10 +1,10 @@
 <template>
-  <UApp>
+  <div class="min-h-screen bg-stone-50">
     <Navbar />
     <main class="pt-16">
       <NuxtPage />
     </main>
-  </UApp>
+  </div>
 </template>
 
 <style>

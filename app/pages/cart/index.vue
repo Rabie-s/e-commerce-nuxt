@@ -70,35 +70,35 @@ onMounted(() => {
 
 // Meta tags
 useHead({
-  title: 'Shopping Cart | MyStore'
+  title: 'Shopping Cart | Vela'
 })
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-stone-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Page Header -->
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">Shopping Cart</h1>
-        <p class="mt-2 text-gray-600">
+        <h1 class="text-3xl font-bold text-stone-950">Shopping Cart</h1>
+        <p class="mt-2 text-stone-500">
           {{ itemCount }} {{ itemCount === 1 ? 'item' : 'items' }} in your cart
         </p>
       </div>
 
       <!-- Empty Cart -->
       <div v-if="isEmpty" class="text-center py-20">
-        <svg class="w-24 h-24 mx-auto text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+        <svg class="w-24 h-24 mx-auto text-stone-200 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
         </svg>
-        <h2 class="text-2xl font-semibold text-gray-900 mb-2">Your cart is empty</h2>
-        <p class="text-gray-600 mb-6">Looks like you haven't added anything to your cart yet.</p>
+        <h2 class="text-2xl font-semibold text-stone-950 mb-2">Your cart is empty</h2>
+        <p class="text-stone-500 mb-6">Looks like you haven't added anything to your cart yet.</p>
         <NuxtLink
           to="/products"
-          class="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-stone-950 text-white rounded-lg hover:bg-stone-900 transition-colors font-medium"
         >
           Continue Shopping
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
           </svg>
         </NuxtLink>
       </div>
@@ -110,7 +110,7 @@ useHead({
           <div
             v-for="item in cartItems"
             :key="item.variant_id"
-            class="bg-white rounded-2xl shadow-sm p-6"
+            class="bg-stone-100 rounded-2xl shadow-sm p-6"
           >
             <div class="flex gap-6">
               <!-- Product Image -->
@@ -131,40 +131,40 @@ useHead({
                   <div>
                     <NuxtLink
                       :to="`/products/${item.product.id}`"
-                      class="text-lg font-semibold text-gray-900 hover:text-gray-600 transition-colors"
+                      class="text-lg font-semibold text-stone-950 hover:text-stone-500 transition-colors"
                     >
                       {{ item.product.name }}
                     </NuxtLink>
-                    <p class="text-sm text-gray-500 mt-1">SKU: {{ item.variant.sku }}</p>
-                    <p class="text-sm text-gray-500">{{ getVariantName(item) }}</p>
+                    <p class="text-sm text-stone-500 mt-1">SKU: {{ item.variant.sku }}</p>
+                    <p class="text-sm text-stone-500">{{ getVariantName(item) }}</p>
                   </div>
-                  <p class="text-xl font-bold text-gray-900">
+                  <p class="text-xl font-bold text-stone-950">
                     {{ formatPrice(item.variant.price) }}
                   </p>
                 </div>
 
                 <div class="flex items-center justify-between mt-4">
                   <!-- Quantity Selector -->
-                  <div class="flex items-center border border-gray-300 rounded-lg">
+                  <div class="flex items-center border border-stone-200 rounded-lg">
                     <button
                       @click="handleUpdateQuantity(item.variant_id, item.quantity - 1)"
                       :disabled="item.quantity <= 1 || updatingQuantity === item.variant_id"
-                      class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      class="w-10 h-10 flex items-center justify-center text-stone-600 hover:bg-stone-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       :aria-label="`Decrease quantity for ${item.product.name}`"
                     >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>
                       </svg>
                     </button>
-                    <span class="w-12 text-center text-gray-900 font-medium">{{ item.quantity }}</span>
+                    <span class="w-12 text-center text-stone-950 font-medium">{{ item.quantity }}</span>
                     <button
                       @click="handleUpdateQuantity(item.variant_id, item.quantity + 1)"
                       :disabled="item.quantity >= item.variant.stock || updatingQuantity === item.variant_id"
-                      class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      class="w-10 h-10 flex items-center justify-center text-stone-600 hover:bg-stone-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       :aria-label="`Increase quantity for ${item.product.name}`"
                     >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                       </svg>
                     </button>
                   </div>
@@ -173,29 +173,29 @@ useHead({
                   <button
                     @click="handleRemoveItem(item.variant_id)"
                     :disabled="removingItem === item.variant_id"
-                    class="text-red-600 hover:text-red-700 font-medium text-sm flex items-center gap-1 disabled:opacity-50 transition-colors"
+                    class="text-red-500 hover:text-red-700 font-medium text-sm flex items-center gap-1 disabled:opacity-50 transition-colors"
                   >
                     <svg v-if="removingItem === item.variant_id" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                     </svg>
-                    <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                     </svg>
                     Remove
                   </button>
                 </div>
 
                 <!-- Stock Warning -->
-                <p v-if="item.quantity >= item.variant.stock" class="text-sm text-orange-600 mt-2" role="alert">
+                <p v-if="item.quantity >= item.variant.stock" class="text-sm text-amber-600 mt-2" role="alert">
                   Maximum stock reached
                 </p>
               </div>
 
               <!-- Item Subtotal -->
               <div class="flex-shrink-0 text-right">
-                <p class="text-sm text-gray-500">Subtotal</p>
-                <p class="text-lg font-bold text-gray-900">
+                <p class="text-sm text-stone-500">Subtotal</p>
+                <p class="text-lg font-bold text-stone-950">
                   {{ formatPrice(parseFloat(item.variant.price) * item.quantity) }}
                 </p>
               </div>
@@ -205,10 +205,10 @@ useHead({
           <!-- Clear Cart Button -->
           <button
             @click="handleClearCart"
-            class="text-red-600 hover:text-red-700 font-medium text-sm flex items-center gap-1 transition-colors"
+            class="text-red-500 hover:text-red-700 font-medium text-sm flex items-center gap-1 transition-colors"
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
             </svg>
             Clear Cart
           </button>
@@ -216,33 +216,33 @@ useHead({
 
         <!-- Order Summary -->
         <div class="lg:col-span-1">
-          <div class="bg-white rounded-2xl shadow-sm p-6 sticky top-24">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
+          <div class="bg-stone-100 rounded-2xl shadow-sm p-6 sticky top-24">
+            <h2 class="text-xl font-bold text-stone-950 mb-6">Order Summary</h2>
 
             <!-- Subtotal -->
             <div class="flex justify-between mb-4">
-              <span class="text-gray-600">Subtotal</span>
-              <span class="font-semibold text-gray-900">{{ formatPrice(subtotal) }}</span>
+              <span class="text-stone-500">Subtotal</span>
+              <span class="font-semibold text-stone-950">{{ formatPrice(subtotal) }}</span>
             </div>
 
             <!-- Shipping -->
             <div class="flex justify-between mb-4">
-              <span class="text-gray-600">Shipping</span>
-              <span class="font-semibold text-green-600">FREE</span>
+              <span class="text-stone-500">Shipping</span>
+              <span class="font-semibold text-emerald-600">FREE</span>
             </div>
 
             <!-- Total -->
-            <div class="border-t border-gray-200 pt-4 mb-6">
+            <div class="border-t border-stone-200 pt-4 mb-6">
               <div class="flex justify-between">
-                <span class="text-lg font-bold text-gray-900">Total</span>
-                <span class="text-2xl font-bold text-gray-900">{{ formatPrice(subtotal) }}</span>
+                <span class="text-lg font-bold text-stone-950">Total</span>
+                <span class="text-2xl font-bold text-stone-950">{{ formatPrice(subtotal) }}</span>
               </div>
             </div>
 
             <!-- Checkout Button -->
             <button
               @click="proceedToCheckout"
-              class="w-full py-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 font-semibold text-lg transition-all hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              class="w-full py-4 bg-stone-950 text-white rounded-lg hover:bg-stone-900 font-semibold text-lg transition-all hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2"
             >
               Proceed to Checkout
             </button>
@@ -250,31 +250,31 @@ useHead({
             <!-- Continue Shopping -->
             <NuxtLink
               to="/products"
-              class="block text-center text-gray-600 hover:text-gray-900 mt-4 transition-colors"
+              class="block text-center text-stone-500 hover:text-stone-950 mt-4 transition-colors"
             >
               Continue Shopping
             </NuxtLink>
 
             <!-- Trust Badges -->
-            <div class="mt-6 pt-6 border-t border-gray-200">
+            <div class="mt-6 pt-6 border-t border-stone-200">
               <div class="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <svg class="w-8 h-8 mx-auto text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                  <svg class="w-8 h-8 mx-auto text-stone-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                   </svg>
-                  <p class="text-xs text-gray-500">Secure</p>
+                  <p class="text-xs text-stone-500">Secure</p>
                 </div>
                 <div>
-                  <svg class="w-8 h-8 mx-auto text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                  <svg class="w-8 h-8 mx-auto text-stone-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                   </svg>
-                  <p class="text-xs text-gray-500">Safe</p>
+                  <p class="text-xs text-stone-500">Safe</p>
                 </div>
                 <div>
-                  <svg class="w-8 h-8 mx-auto text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                  <svg class="w-8 h-8 mx-auto text-stone-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
                   </svg>
-                  <p class="text-xs text-gray-500">Payment</p>
+                  <p class="text-xs text-stone-500">Payment</p>
                 </div>
               </div>
             </div>

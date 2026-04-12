@@ -1,22 +1,22 @@
 <script setup lang="ts">
-interface Brand {
+interface Category {
   id: number
   name: string
   description: string | null
   main_image: string | null
 }
 
-// Fetch brands from API
-const { data: brandsData } = await useFetch<Brand[]>('/brands', {
+// Fetch categories from API
+const { data: categoriesData } = await useFetch<Category[]>('/categories/', {
   baseURL: useRuntimeConfig().public.apiBase,
   transform: (data: any) => data.data,
 })
 
-const brands = computed(() => brandsData.value || [])
+const categories = computed(() => categoriesData.value || [])
 
 // Meta tags
 useHead({
-  title: 'Brands | Vela'
+  title: 'Categories | Vela'
 })
 </script>
 
@@ -26,44 +26,44 @@ useHead({
       <!-- Page Header -->
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-stone-950">
-          Brands
+          Categories
         </h1>
         <p class="mt-2 text-stone-500">
-          Browse our collection of {{ brands.length }} brands
+          Browse our collection of {{ categories.length }} categories
         </p>
       </div>
 
-      <!-- Brands Grid -->
-      <div v-if="brands.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <!-- Categories Grid -->
+      <div v-if="categories.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <NuxtLink
-          v-for="brand in brands"
-          :key="brand.id"
-          :to="`/products?brand=${brand.id}`"
+          v-for="category in categories"
+          :key="category.id"
+          :to="`/products?category=${category.id}`"
           class="group block"
         >
           <div class="bg-stone-100 rounded-2xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
-            <!-- Brand Image -->
-            <div v-if="brand.main_image" class="relative aspect-square bg-stone-50 overflow-hidden">
+            <!-- Category Image -->
+            <div v-if="category.main_image" class="relative aspect-square bg-stone-50 overflow-hidden">
               <img
-                :src="`http://e-commerce-laravel.test/${brand.main_image}`"
-                :alt="brand.name"
+                :src="`http://e-commerce-laravel.test/${category.main_image}`"
+                :alt="category.name"
                 class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
               />
             </div>
             <div v-else class="relative aspect-square bg-stone-200 overflow-hidden flex items-center justify-center">
               <svg class="w-16 h-16 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
               </svg>
             </div>
 
-            <!-- Brand Info -->
+            <!-- Category Info -->
             <div class="p-6">
               <h3 class="text-lg font-semibold text-stone-950 mb-2">
-                {{ brand.name }}
+                {{ category.name }}
               </h3>
-              <p v-if="brand.description" class="text-sm text-stone-500 line-clamp-2">
-                {{ brand.description }}
+              <p v-if="category.description" class="text-sm text-stone-500 line-clamp-2">
+                {{ category.description }}
               </p>
               <p v-else class="text-sm text-stone-400 italic">
                 No description available
@@ -76,10 +76,10 @@ useHead({
       <!-- No Results -->
       <div v-else class="text-center py-20">
         <svg class="w-16 h-16 mx-auto text-stone-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
         </svg>
-        <h3 class="text-xl font-semibold text-stone-950 mb-2">No brands found</h3>
-        <p class="text-stone-500">Check back later for new brands</p>
+        <h3 class="text-xl font-semibold text-stone-950 mb-2">No categories found</h3>
+        <p class="text-stone-500">Check back later for new categories</p>
       </div>
     </div>
   </div>
