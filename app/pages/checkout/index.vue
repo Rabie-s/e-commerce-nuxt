@@ -43,39 +43,11 @@ const formatPrice = (price: string | number): string => {
 const validateForm = (): boolean => {
   const newErrors: Record<string, string> = {}
 
-  if (!formData.first_name.trim()) {
-    newErrors.first_name = 'First name is required'
-  } else if (formData.first_name.length > 255) {
-    newErrors.first_name = 'First name is too long'
-  }
-
-  if (!formData.last_name.trim()) {
-    newErrors.last_name = 'Last name is required'
-  } else if (formData.last_name.length > 255) {
-    newErrors.last_name = 'Last name is too long'
-  }
-
-  if (!formData.phone_number.trim()) {
-    newErrors.phone_number = 'Phone number is required'
-  } else if (formData.phone_number.length > 20) {
-    newErrors.phone_number = 'Phone number is too long'
-  }
-
-  if (!formData.city.trim()) {
-    newErrors.city = 'City is required'
-  } else if (formData.city.length > 255) {
-    newErrors.city = 'City name is too long'
-  }
-
-  if (!formData.address.trim()) {
-    newErrors.address = 'Address is required'
-  } else if (formData.address.length > 500) {
-    newErrors.address = 'Address is too long'
-  }
-
-  if (formData.nearby_landmark && formData.nearby_landmark.length > 255) {
-    newErrors.nearby_landmark = 'Nearby landmark is too long'
-  }
+  if (!formData.first_name.trim()) newErrors.first_name = 'First name is required'
+  if (!formData.last_name.trim()) newErrors.last_name = 'Last name is required'
+  if (!formData.phone_number.trim()) newErrors.phone_number = 'Phone number is required'
+  if (!formData.city.trim()) newErrors.city = 'City is required'
+  if (!formData.address.trim()) newErrors.address = 'Address is required'
 
   errors.value = newErrors
   return Object.keys(newErrors).length === 0
@@ -83,10 +55,7 @@ const validateForm = (): boolean => {
 
 // Submit order
 const submitOrder = async () => {
-  if (!validateForm()) {
-    return
-  }
-
+  if (!validateForm()) return
   if (isEmpty.value) {
     orderError.value = 'Your cart is empty'
     return
@@ -96,7 +65,6 @@ const submitOrder = async () => {
   orderError.value = null
 
   try {
-    // Prepare order data - ensure nearby_landmark is sent as empty string if not provided
     const orderData = {
       customer_info: {
         ...formData,
@@ -108,7 +76,6 @@ const submitOrder = async () => {
       }))
     }
 
-    // Make API request
     const response = await fetch(`${API_BASE}/api/v1/orders`, {
       method: 'POST',
       headers: {
@@ -129,18 +96,15 @@ const submitOrder = async () => {
     }
 
     const result = await response.json()
-
-    // Clear cart after successful order
     cartStore.clearCart()
     orderSuccess.value = true
 
-    // Redirect to order confirmation page
     setTimeout(() => {
       router.push(`/orders/${result.order_uuid}`)
     }, 1500)
   } catch (error) {
     console.error('Order submission error:', error)
-    orderError.value = 'Network error. Please check your connection and try again.'
+    orderError.value = 'Network error. Please check your connection.'
   } finally {
     isSubmitting.value = false
   }
@@ -165,262 +129,270 @@ onMounted(() => {
   }
 })
 
-// Meta tags
 useHead({
-  title: 'Checkout | Vela'
+  title: 'Checkout | Gallery'
 })
 </script>
 
 <template>
-  <div class="min-h-screen bg-stone-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="min-h-screen bg-[#f8f9fa]" style="font-family: 'Inter', sans-serif;">
+    <div class="max-w-7xl mx-auto px-8 py-12">
+
       <!-- Page Header -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-stone-950">Checkout</h1>
-        <p class="mt-2 text-stone-500">
+      <div class="mb-10">
+        <h1
+            class="text-[32px] font-semibold tracking-[-0.02em] text-[#191c1d]"
+            style="font-family: 'Manrope', sans-serif;"
+        >
+          Checkout
+        </h1>
+        <p class="mt-2 text-sm text-[#191c1d]/50 tracking-tight">
           Complete your order
         </p>
       </div>
 
       <!-- Success Message -->
       <div
-        v-if="orderSuccess"
-        class="mb-8 bg-emerald-50 border border-emerald-200 rounded-2xl p-6 text-center"
+          v-if="orderSuccess"
+          class="mb-8 bg-emerald-50 border border-emerald-200 rounded-2xl p-8 text-center"
       >
-        <svg class="w-16 h-16 mx-auto text-emerald-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <svg class="w-16 h-16 mx-auto text-emerald-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
-        <h2 class="text-2xl font-bold text-emerald-900 mb-2">Order Placed Successfully!</h2>
-        <p class="text-emerald-700">Redirecting to your order details...</p>
+        <h2 class="text-xl font-semibold text-emerald-900 mb-2" style="font-family: 'Manrope', sans-serif;">Order Placed Successfully!</h2>
+        <p class="text-emerald-700 text-sm">Redirecting to your order details...</p>
       </div>
 
       <!-- Error Message -->
       <div
-        v-if="orderError"
-        class="mb-8 bg-red-50 border border-red-200 rounded-2xl p-6"
-        role="alert"
+          v-if="orderError"
+          class="mb-8 bg-red-50 border border-red-200 rounded-2xl p-6"
+          role="alert"
       >
         <div class="flex items-start gap-3">
-          <svg class="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
           <div>
-            <h3 class="font-semibold text-red-900">Error</h3>
-            <p class="text-red-700 mt-1">{{ orderError }}</p>
+            <h3 class="font-semibold text-red-900 text-sm">Error</h3>
+            <p class="text-red-700 text-sm mt-1">{{ orderError }}</p>
           </div>
         </div>
       </div>
 
-      <div v-if="!orderSuccess" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Checkout Form -->
-        <div class="lg:col-span-2">
-          <div class="bg-stone-100 rounded-2xl shadow-sm p-6 lg:p-10">
-            <h2 class="text-2xl font-bold text-stone-950 mb-6">Customer Information</h2>
+      <div v-if="!orderSuccess" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-            <form @submit.prevent="submitOrder" class="space-y-6">
+        <!-- Left Column: Forms -->
+        <div class="lg:col-span-7 space-y-6">
+
+          <!-- Delivery Details Card -->
+          <div class="bg-white rounded-2xl p-6 border border-[#191c1d]/5">
+            <h2 class="text-lg font-semibold text-[#191c1d] mb-6 tracking-tight" style="font-family: 'Manrope', sans-serif;">
+              Delivery Details
+            </h2>
+
+            <form @submit.prevent="submitOrder" class="space-y-5">
               <!-- Name Row -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- First Name -->
-                <div>
-                  <label for="first_name" class="block text-sm font-medium text-stone-900 mb-1">
-                    First Name <span class="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="first_name"
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <UiInput
                     v-model="formData.first_name"
-                    type="text"
-                    :class="[
-                      'w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-colors',
-                      errors.first_name ? 'border-red-300 focus:ring-red-500' : 'border-stone-200'
-                    ]"
+                    label="First Name"
                     placeholder="John"
+                    :error="errors.first_name"
                     required
-                  />
-                  <p v-if="errors.first_name" class="mt-1 text-sm text-red-600">{{ errors.first_name }}</p>
-                </div>
-
-                <!-- Last Name -->
-                <div>
-                  <label for="last_name" class="block text-sm font-medium text-stone-900 mb-1">
-                    Last Name <span class="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="last_name"
+                />
+                <UiInput
                     v-model="formData.last_name"
-                    type="text"
-                    :class="[
-                      'w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-colors',
-                      errors.last_name ? 'border-red-300 focus:ring-red-500' : 'border-stone-200'
-                    ]"
+                    label="Last Name"
                     placeholder="Doe"
+                    :error="errors.last_name"
                     required
-                  />
-                  <p v-if="errors.last_name" class="mt-1 text-sm text-red-600">{{ errors.last_name }}</p>
-                </div>
+                />
               </div>
 
-              <!-- Phone Number -->
-              <div>
-                <label for="phone_number" class="block text-sm font-medium text-stone-900 mb-1">
-                  Phone Number <span class="text-red-500">*</span>
-                </label>
-                <input
-                  id="phone_number"
-                  v-model="formData.phone_number"
-                  type="tel"
-                  :class="[
-                    'w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-colors',
-                    errors.phone_number ? 'border-red-300 focus:ring-red-500' : 'border-stone-200'
-                  ]"
-                  placeholder="+1 (555) 123-4567"
-                  required
+              <!-- Phone & City Row -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <UiInput
+                    v-model="formData.phone_number"
+                    label="Phone Number"
+                    placeholder="+1 (555) 123-4567"
+                    :error="errors.phone_number"
+                    required
                 />
-                <p v-if="errors.phone_number" class="mt-1 text-sm text-red-600">{{ errors.phone_number }}</p>
-              </div>
-
-              <!-- City -->
-              <div>
-                <label for="city" class="block text-sm font-medium text-stone-900 mb-1">
-                  City <span class="text-red-500">*</span>
-                </label>
-                <input
-                  id="city"
-                  v-model="formData.city"
-                  type="text"
-                  :class="[
-                    'w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-colors',
-                    errors.city ? 'border-red-300 focus:ring-red-500' : 'border-stone-200'
-                  ]"
-                  placeholder="New York"
-                  required
+                <UiInput
+                    v-model="formData.city"
+                    label="City"
+                    placeholder="New York"
+                    :error="errors.city"
+                    required
                 />
-                <p v-if="errors.city" class="mt-1 text-sm text-red-600">{{ errors.city }}</p>
               </div>
 
               <!-- Address -->
               <div>
-                <label for="address" class="block text-sm font-medium text-stone-900 mb-1">
+                <!-- Using UiInput logic for textarea requires a small workaround or a separate component,
+                     but for simplicity here we style a textarea to match UiInput visually if UiInput doesn't support textarea natively.
+                     Assuming UiInput is text-only, we use a styled textarea. -->
+                <label class="block mb-2 text-xs font-semibold text-[#191c1d]/70 uppercase tracking-wider">
                   Address <span class="text-red-500">*</span>
                 </label>
                 <textarea
-                  id="address"
-                  v-model="formData.address"
-                  rows="3"
-                  :class="[
-                    'w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-colors resize-none',
-                    errors.address ? 'border-red-300 focus:ring-red-500' : 'border-stone-200'
+                    v-model="formData.address"
+                    rows="3"
+                    :class="[
+                    'w-full block rounded-xl px-4 py-3 resize-none',
+                    'bg-white text-[#191c1d] placeholder:text-[#191c1d]/50 text-sm',
+                    'border border-[#191c1d]/20 focus:border-black focus:ring-4 focus:ring-black/5 focus:outline-none transition-all',
+                    errors.address ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/10' : ''
                   ]"
-                  placeholder="123 Main Street, Apt 4B"
-                  required
+                    placeholder="123 Main Street, Apt 4B"
                 ></textarea>
-                <p v-if="errors.address" class="mt-1 text-sm text-red-600">{{ errors.address }}</p>
+                <p v-if="errors.address" class="mt-2 text-xs text-red-600 font-medium">{{ errors.address }}</p>
               </div>
 
-              <!-- Nearby Landmark (Optional) -->
-              <div>
-                <label for="nearby_landmark" class="block text-sm font-medium text-stone-900 mb-1">
-                  Nearby Landmark <span class="text-stone-400">(Optional)</span>
-                </label>
-                <input
-                  id="nearby_landmark"
+              <!-- Note / Landmark -->
+              <UiInput
                   v-model="formData.nearby_landmark"
-                  type="text"
-                  :class="[
-                    'w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-colors',
-                    errors.nearby_landmark ? 'border-red-300 focus:ring-red-500' : 'border-stone-200'
-                  ]"
+                  label="Note / Remark (Optional)"
                   placeholder="Near Central Park"
-                />
-                <p v-if="errors.nearby_landmark" class="mt-1 text-sm text-red-600">{{ errors.nearby_landmark }}</p>
-              </div>
-
-              <!-- Submit Button -->
-              <button
-                type="submit"
-                :disabled="isSubmitting || isEmpty"
-                class="w-full py-4 bg-stone-950 text-white rounded-xl hover:bg-stone-900 disabled:bg-stone-400 disabled:cursor-not-allowed font-semibold text-lg transition-all hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 flex items-center justify-center gap-3"
-              >
-                <svg v-if="isSubmitting" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                </svg>
-                {{ isSubmitting ? 'Placing Order...' : `Place Order - ${formatPrice(subtotal)}` }}
-              </button>
+                  :error="errors.nearby_landmark"
+              />
             </form>
           </div>
+
+          <!-- Payment Method Card -->
+          <div class="bg-white rounded-2xl p-6 border border-[#191c1d]/5">
+            <h2 class="text-lg font-semibold text-[#191c1d] mb-6 tracking-tight" style="font-family: 'Manrope', sans-serif;">
+              Payment Method
+            </h2>
+
+            <!-- Selected Payment Option -->
+            <div class="flex items-center gap-4 p-4 rounded-xl bg-[#f8f9fa] border border-[#191c1d]/10">
+              <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center border border-[#191c1d]/5">
+                <svg class="w-5 h-5 text-[#191c1d]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/>
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-[#191c1d]">Cash on Delivery</p>
+                <p class="text-xs text-[#191c1d]/50">Pay when you receive your order</p>
+              </div>
+              <!-- Checkmark -->
+              <div class="ml-auto w-5 h-5 rounded-full bg-black flex items-center justify-center">
+                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Place Order Button (Mobile) -->
+          <div class="lg:hidden">
+            <UiButton
+                size="lg"
+                block
+                @click="submitOrder"
+                :disabled="isSubmitting || isEmpty"
+            >
+              <span v-if="isSubmitting" class="flex items-center gap-2">
+                <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Placing Order...
+              </span>
+              <span v-else>Place Order - {{ formatPrice(subtotal) }}</span>
+            </UiButton>
+          </div>
+
         </div>
 
-        <!-- Order Summary -->
-        <div class="lg:col-span-1">
-          <div class="bg-stone-100 rounded-2xl shadow-sm p-6 sticky top-24">
-            <h2 class="text-xl font-bold text-stone-950 mb-6">Order Summary</h2>
+        <!-- Right Column: Order Summary -->
+        <div class="lg:col-span-5">
+          <div class="bg-white rounded-2xl p-6 border border-[#191c1d]/5 sticky top-8">
+
+            <h2 class="text-lg font-semibold text-[#191c1d] mb-5 tracking-tight" style="font-family: 'Manrope', sans-serif;">
+              Order Summary
+            </h2>
 
             <!-- Cart Items -->
             <div class="space-y-4 mb-6">
               <div
-                v-for="item in cartItems"
-                :key="item.variant_id"
-                class="flex gap-4 pb-4 border-b border-stone-200 last:border-0 last:pb-0"
+                  v-for="item in cartItems"
+                  :key="item.variant_id"
+                  class="flex gap-4"
               >
                 <img
-                  :src="item.variant.main_image || item.product.main_image || 'https://via.placeholder.com/80'"
-                  :alt="item.product.name"
-                  class="w-16 h-16 object-cover rounded-lg"
-                  loading="lazy"
+                    :src="item.variant.main_image || item.product.main_image || 'https://via.placeholder.com/80'"
+                    :alt="item.product.name"
+                    class="w-20 h-20 object-cover rounded-xl bg-[#f3f4f5]"
+                    loading="lazy"
                 />
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-stone-950 truncate">{{ item.product.name }}</p>
-                  <p class="text-xs text-stone-500">{{ getVariantName(item) }}</p>
-                  <p class="text-sm text-stone-500 mt-1">Qty: {{ item.quantity }}</p>
+                <div class="flex-1 min-w-0 flex flex-col justify-center">
+                  <p class="text-sm font-semibold text-[#191c1d] truncate" style="font-family: 'Manrope', sans-serif;">
+                    {{ item.product.name }}
+                  </p>
+                  <p class="text-xs text-[#191c1d]/40 mt-0.5">{{ getVariantName(item) }}</p>
+                  <p class="text-xs text-[#191c1d]/40 mt-0.5">Qty: {{ item.quantity }}</p>
                 </div>
-                <p class="text-sm font-semibold text-stone-950">
-                  {{ formatPrice(parseFloat(item.variant.price) * item.quantity) }}
-                </p>
+                <div class="flex items-center">
+                  <p class="text-sm font-semibold text-[#191c1d]" style="font-family: 'Manrope', sans-serif;">
+                    {{ formatPrice(parseFloat(item.variant.price) * item.quantity) }}
+                  </p>
+                </div>
               </div>
             </div>
 
-            <!-- Subtotal -->
-            <div class="flex justify-between mb-4">
-              <span class="text-stone-500">Subtotal</span>
-              <span class="font-semibold text-stone-950">{{ formatPrice(subtotal) }}</span>
-            </div>
-
-            <!-- Shipping -->
-            <div class="flex justify-between mb-4">
-              <span class="text-stone-500">Shipping</span>
-              <span class="font-semibold text-emerald-600">FREE</span>
+            <!-- Calculations -->
+            <div class="space-y-3 text-sm border-t border-[#191c1d]/5 pt-5">
+              <div class="flex justify-between">
+                <span class="text-[#191c1d]/50">Subtotal</span>
+                <span class="font-semibold text-[#191c1d]">{{ formatPrice(subtotal) }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-[#191c1d]/50">Shipping</span>
+                <span class="font-semibold text-emerald-600 text-xs uppercase tracking-wider">Free</span>
+              </div>
             </div>
 
             <!-- Total -->
-            <div class="border-t border-stone-200 pt-4 mb-6">
-              <div class="flex justify-between">
-                <span class="text-lg font-bold text-stone-950">Total</span>
-                <span class="text-2xl font-bold text-stone-950">{{ formatPrice(subtotal) }}</span>
-              </div>
+            <div class="flex justify-between mt-5 pt-5 border-t border-[#191c1d]/5">
+              <span class="text-sm font-semibold text-[#191c1d]">Total</span>
+              <span class="text-xl font-bold text-[#191c1d]" style="font-family: 'Manrope', sans-serif;">
+                {{ formatPrice(subtotal) }}
+              </span>
             </div>
 
-            <!-- Payment Method -->
-            <div class="bg-stone-200 rounded-lg p-4">
-              <div class="flex items-center gap-3">
-                <svg class="w-6 h-6 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-                </svg>
-                <div>
-                  <p class="text-sm font-semibold text-stone-950">Cash on Delivery</p>
-                  <p class="text-xs text-stone-500">Pay when you receive your order</p>
-                </div>
-              </div>
+            <!-- Place Order Button (Desktop) -->
+            <div class="mt-6 hidden lg:block">
+              <UiButton
+                  size="lg"
+                  block
+                  @click="submitOrder"
+                  :disabled="isSubmitting || isEmpty"
+              >
+                <span v-if="isSubmitting" class="flex items-center justify-center gap-2">
+                   <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Placing Order...
+                </span>
+                <span v-else>Place Order</span>
+              </UiButton>
             </div>
 
-            <!-- Back to Cart -->
-            <NuxtLink
-              to="/cart"
-              class="block text-center text-stone-500 hover:text-stone-950 mt-4 transition-colors"
-            >
-              ← Back to Cart
-            </NuxtLink>
+            <!-- Secure Checkout Footer -->
+            <div class="mt-6 pt-5 border-t border-[#191c1d]/5 flex items-center justify-center gap-2 text-[#191c1d]/40">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+              </svg>
+              <span class="text-[11px] font-medium uppercase tracking-wider">Secure Checkout</span>
+            </div>
+
           </div>
         </div>
+
       </div>
     </div>
   </div>

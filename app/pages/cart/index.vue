@@ -14,7 +14,7 @@ const isEmpty = computed(() => cartItems.value.length === 0)
 const updatingQuantity = ref<number | null>(null)
 const removingItem = ref<number | null>(null)
 
-// Format price (memoized function)
+// Format price
 const formatPrice = (price: string | number): string => {
   const numPrice = typeof price === 'string' ? parseFloat(price) : price
   return new Intl.NumberFormat('en-US', {
@@ -23,14 +23,15 @@ const formatPrice = (price: string | number): string => {
   }).format(numPrice)
 }
 
-// Get variant display name
+// Get variant display name — guards against missing attribute_values
 const getVariantName = (item: CartItem): string => {
+  if (!item.variant.attribute_values?.length) return ''
   return item.variant.attribute_values.map(av => av.value).join(' / ')
 }
 
-// Get product image
+// Get product image — image always lives on product, never on variant
 const getProductImage = (item: CartItem): string => {
-  return item.variant.main_image || item.product.main_image || 'https://via.placeholder.com/150'
+  return item.product.main_image || 'https://via.placeholder.com/150'
 }
 
 // Update quantity
@@ -68,218 +69,197 @@ onMounted(() => {
   }
 })
 
-// Meta tags
 useHead({
-  title: 'Shopping Cart | Vela'
+  title: 'Your Cart | Vela'
 })
 </script>
 
 <template>
-  <div class="min-h-screen bg-stone-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="min-h-screen bg-[#f8f9fa]" style="font-family: 'Inter', sans-serif;">
+    <div class="max-w-7xl mx-auto px-8 py-12">
+
       <!-- Page Header -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-stone-950">Shopping Cart</h1>
-        <p class="mt-2 text-stone-500">
-          {{ itemCount }} {{ itemCount === 1 ? 'item' : 'items' }} in your cart
+      <div class="mb-10">
+        <h1
+            class="text-[32px] font-semibold tracking-[-0.02em] text-[#191c1d]"
+            style="font-family: 'Manrope', sans-serif;"
+        >
+          Your Cart
+        </h1>
+        <p class="mt-2 text-sm text-[#191c1d]/50 tracking-tight">
+          {{ itemCount }} {{ itemCount === 1 ? 'item' : 'items' }}
         </p>
       </div>
 
       <!-- Empty Cart -->
-      <div v-if="isEmpty" class="text-center py-20">
-        <svg class="w-24 h-24 mx-auto text-stone-200 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
+      <div v-if="isEmpty" class="text-center py-24 bg-white rounded-2xl border border-[#191c1d]/5">
+        <svg class="w-20 h-20 mx-auto text-[#191c1d]/10 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
         </svg>
-        <h2 class="text-2xl font-semibold text-stone-950 mb-2">Your cart is empty</h2>
-        <p class="text-stone-500 mb-6">Looks like you haven't added anything to your cart yet.</p>
-        <NuxtLink
-          to="/products"
-          class="inline-flex items-center gap-2 px-6 py-3 bg-stone-950 text-white rounded-lg hover:bg-stone-900 transition-colors font-medium"
-        >
+        <h2 class="text-xl font-semibold text-[#191c1d] mb-2" style="font-family: 'Manrope', sans-serif;">
+          Your cart is empty
+        </h2>
+        <p class="text-[#191c1d]/50 mb-8 text-sm">Looks like you haven't added anything to your cart yet.</p>
+        <UiButton to="/products">
           Continue Shopping
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-          </svg>
-        </NuxtLink>
+        </UiButton>
       </div>
 
       <!-- Cart Content -->
-      <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Cart Items -->
-        <div class="lg:col-span-2 space-y-4">
-          <div
-            v-for="item in cartItems"
-            :key="item.variant_id"
-            class="bg-stone-100 rounded-2xl shadow-sm p-6"
-          >
-            <div class="flex gap-6">
-              <!-- Product Image -->
-              <div class="flex-shrink-0">
-                <NuxtLink :to="`/products/${item.product.id}`" class="block">
-                  <img
-                    :src="getProductImage(item)"
-                    :alt="item.product.name"
-                    class="w-32 h-32 object-cover rounded-lg"
-                    loading="lazy"
-                  />
-                </NuxtLink>
-              </div>
+      <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-              <!-- Product Info -->
-              <div class="flex-1">
-                <div class="flex justify-between mb-2">
-                  <div>
-                    <NuxtLink
+        <!-- Left Column: Cart Items -->
+        <div class="lg:col-span-8 space-y-4">
+
+          <!-- Item Card -->
+          <div
+              v-for="item in cartItems"
+              :key="item.variant_id"
+              class="bg-white rounded-2xl p-5 flex gap-5 border border-[#191c1d]/5 hover:border-[#191c1d]/10 transition-colors"
+          >
+            <!-- Product Image -->
+            <NuxtLink :to="`/products/${item.product.id}`" class="block w-28 h-28 flex-shrink-0 rounded-xl overflow-hidden bg-[#f3f4f5]">
+              <img
+                  :src="getProductImage(item)"
+                  :alt="item.product.name"
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+              />
+            </NuxtLink>
+
+            <!-- Product Details -->
+            <div class="flex-1 flex flex-col min-w-0">
+
+              <!-- Top Row: Info -->
+              <div class="flex justify-between items-start mb-3">
+                <div>
+                  <NuxtLink
                       :to="`/products/${item.product.id}`"
-                      class="text-lg font-semibold text-stone-950 hover:text-stone-500 transition-colors"
-                    >
-                      {{ item.product.name }}
-                    </NuxtLink>
-                    <p class="text-sm text-stone-500 mt-1">SKU: {{ item.variant.sku }}</p>
-                    <p class="text-sm text-stone-500">{{ getVariantName(item) }}</p>
-                  </div>
-                  <p class="text-xl font-bold text-stone-950">
-                    {{ formatPrice(item.variant.price) }}
+                      class="text-[15px] font-semibold text-[#191c1d] tracking-[-0.01em] block hover:text-[#191c1d]/70 transition-colors"
+                      style="font-family: 'Manrope', sans-serif;"
+                  >
+                    {{ item.product.name }}
+                  </NuxtLink>
+                  <p class="text-[11px] text-[#191c1d]/40 mt-1 uppercase tracking-wider">
+                    {{ getVariantName(item) }}
                   </p>
                 </div>
+                <!-- Item Price (Unit Price) -->
+                <p class="text-[15px] font-semibold text-[#191c1d] shrink-0 ml-4" style="font-family: 'Manrope', sans-serif;">
+                  {{ formatPrice(item.variant.price) }}
+                </p>
+              </div>
 
-                <div class="flex items-center justify-between mt-4">
-                  <!-- Quantity Selector -->
-                  <div class="flex items-center border border-stone-200 rounded-lg">
-                    <button
+              <!-- Bottom Row: Controls -->
+              <div class="mt-auto flex items-center justify-between">
+
+                <!-- Quantity Selector -->
+                <div class="flex items-center border border-[#191c1d]/10 rounded-lg">
+                  <button
                       @click="handleUpdateQuantity(item.variant_id, item.quantity - 1)"
                       :disabled="item.quantity <= 1 || updatingQuantity === item.variant_id"
-                      class="w-10 h-10 flex items-center justify-center text-stone-600 hover:bg-stone-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      :aria-label="`Decrease quantity for ${item.product.name}`"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>
-                      </svg>
-                    </button>
-                    <span class="w-12 text-center text-stone-950 font-medium">{{ item.quantity }}</span>
-                    <button
+                      class="w-9 h-9 flex items-center justify-center text-[#191c1d]/40 hover:text-[#191c1d] hover:bg-[#f3f4f5] disabled:opacity-30 disabled:cursor-not-allowed transition-colors rounded-l-lg"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>
+                    </svg>
+                  </button>
+                  <span class="w-10 text-center text-sm font-semibold text-[#191c1d]">
+                    {{ item.quantity }}
+                  </span>
+                  <button
                       @click="handleUpdateQuantity(item.variant_id, item.quantity + 1)"
                       :disabled="item.quantity >= item.variant.stock || updatingQuantity === item.variant_id"
-                      class="w-10 h-10 flex items-center justify-center text-stone-600 hover:bg-stone-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      :aria-label="`Increase quantity for ${item.product.name}`"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                      </svg>
-                    </button>
-                  </div>
-
-                  <!-- Remove Button -->
-                  <button
-                    @click="handleRemoveItem(item.variant_id)"
-                    :disabled="removingItem === item.variant_id"
-                    class="text-red-500 hover:text-red-700 font-medium text-sm flex items-center gap-1 disabled:opacity-50 transition-colors"
+                      class="w-9 h-9 flex items-center justify-center text-[#191c1d]/40 hover:text-[#191c1d] hover:bg-[#f3f4f5] disabled:opacity-30 disabled:cursor-not-allowed transition-colors rounded-r-lg"
                   >
-                    <svg v-if="removingItem === item.variant_id" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                     </svg>
-                    <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
-                    Remove
                   </button>
                 </div>
 
-                <!-- Stock Warning -->
-                <p v-if="item.quantity >= item.variant.stock" class="text-sm text-amber-600 mt-2" role="alert">
-                  Maximum stock reached
-                </p>
+                <!-- Remove Link -->
+                <button
+                    @click="handleRemoveItem(item.variant_id)"
+                    :disabled="removingItem === item.variant_id"
+                    class="text-[11px] font-semibold uppercase tracking-wider text-[#191c1d]/30 hover:text-red-500 transition-colors flex items-center gap-1 disabled:opacity-50"
+                >
+                  <span v-if="removingItem === item.variant_id">Removing...</span>
+                  <span v-else>Remove</span>
+                </button>
               </div>
 
-              <!-- Item Subtotal -->
-              <div class="flex-shrink-0 text-right">
-                <p class="text-sm text-stone-500">Subtotal</p>
-                <p class="text-lg font-bold text-stone-950">
-                  {{ formatPrice(parseFloat(item.variant.price) * item.quantity) }}
-                </p>
-              </div>
+              <!-- Stock Warning -->
+              <p v-if="item.quantity >= item.variant.stock" class="text-[11px] text-amber-600 mt-3" role="alert">
+                Maximum stock reached
+              </p>
             </div>
           </div>
 
-          <!-- Clear Cart Button -->
-          <button
-            @click="handleClearCart"
-            class="text-red-500 hover:text-red-700 font-medium text-sm flex items-center gap-1 transition-colors"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-            </svg>
-            Clear Cart
-          </button>
+          <!-- Clear Cart -->
+          <div class="pt-4 flex justify-end">
+            <button
+                @click="handleClearCart"
+                class="text-[11px] font-semibold uppercase tracking-wider text-[#191c1d]/30 hover:text-red-500 transition-colors"
+            >
+              Clear Entire Cart
+            </button>
+          </div>
+
         </div>
 
-        <!-- Order Summary -->
-        <div class="lg:col-span-1">
-          <div class="bg-stone-100 rounded-2xl shadow-sm p-6 sticky top-24">
-            <h2 class="text-xl font-bold text-stone-950 mb-6">Order Summary</h2>
+        <!-- Right Column: Order Summary -->
+        <div class="lg:col-span-4">
+          <div class="bg-white rounded-2xl p-6 border border-[#191c1d]/5 sticky top-8">
 
-            <!-- Subtotal -->
-            <div class="flex justify-between mb-4">
-              <span class="text-stone-500">Subtotal</span>
-              <span class="font-semibold text-stone-950">{{ formatPrice(subtotal) }}</span>
+            <h2 class="text-lg font-semibold text-[#191c1d] mb-5 tracking-tight" style="font-family: 'Manrope', sans-serif;">
+              Order Summary
+            </h2>
+
+            <!-- Summary Rows -->
+            <div class="space-y-3 text-sm">
+              <div class="flex justify-between">
+                <span class="text-[#191c1d]/50">Subtotal</span>
+                <span class="font-semibold text-[#191c1d]">{{ formatPrice(subtotal) }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-[#191c1d]/50">Shipping</span>
+                <span class="font-semibold text-emerald-600 text-xs uppercase tracking-wider">Free</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-[#191c1d]/50">Estimated Tax</span>
+                <span class="font-semibold text-[#191c1d]">$0.00</span>
+              </div>
             </div>
 
-            <!-- Shipping -->
-            <div class="flex justify-between mb-4">
-              <span class="text-stone-500">Shipping</span>
-              <span class="font-semibold text-emerald-600">FREE</span>
-            </div>
+            <!-- Divider -->
+            <div class="my-5 border-t border-[#191c1d]/5"></div>
 
             <!-- Total -->
-            <div class="border-t border-stone-200 pt-4 mb-6">
-              <div class="flex justify-between">
-                <span class="text-lg font-bold text-stone-950">Total</span>
-                <span class="text-2xl font-bold text-stone-950">{{ formatPrice(subtotal) }}</span>
-              </div>
+            <div class="flex justify-between mb-6">
+              <span class="text-sm font-semibold text-[#191c1d]">Total</span>
+              <span class="text-xl font-bold text-[#191c1d]" style="font-family: 'Manrope', sans-serif;">
+                {{ formatPrice(subtotal) }}
+              </span>
             </div>
 
             <!-- Checkout Button -->
-            <button
-              @click="proceedToCheckout"
-              class="w-full py-4 bg-stone-950 text-white rounded-lg hover:bg-stone-900 font-semibold text-lg transition-all hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2"
+            <UiButton
+                size="lg"
+                block
+                @click="proceedToCheckout"
             >
               Proceed to Checkout
-            </button>
+            </UiButton>
 
-            <!-- Continue Shopping -->
-            <NuxtLink
-              to="/products"
-              class="block text-center text-stone-500 hover:text-stone-950 mt-4 transition-colors"
-            >
-              Continue Shopping
-            </NuxtLink>
-
-            <!-- Trust Badges -->
-            <div class="mt-6 pt-6 border-t border-stone-200">
-              <div class="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <svg class="w-8 h-8 mx-auto text-stone-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                  </svg>
-                  <p class="text-xs text-stone-500">Secure</p>
-                </div>
-                <div>
-                  <svg class="w-8 h-8 mx-auto text-stone-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                  </svg>
-                  <p class="text-xs text-stone-500">Safe</p>
-                </div>
-                <div>
-                  <svg class="w-8 h-8 mx-auto text-stone-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                  </svg>
-                  <p class="text-xs text-stone-500">Payment</p>
-                </div>
-              </div>
-            </div>
+            <!-- Footer Text -->
+            <p class="mt-4 text-[10px] text-[#191c1d]/30 text-center leading-relaxed">
+              By placing your order, you agree to our company<br>
+              <a href="#" class="underline hover:text-[#191c1d]/50">Terms of Service</a> and <a href="#" class="underline hover:text-[#191c1d]/50">Privacy Policy</a>.
+            </p>
           </div>
         </div>
+
       </div>
     </div>
   </div>

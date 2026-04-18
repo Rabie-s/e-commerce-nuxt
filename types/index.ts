@@ -26,8 +26,7 @@ export interface ProductVariant {
   price: string
   is_default: boolean
   stock: number
-  main_image: string | null
-  attribute_values: AttributeValue[]
+  attribute_values: AttributeValue[]  // removed main_image — image belongs to product only
 }
 
 export interface AttributeValue {
@@ -57,11 +56,11 @@ export interface CartItem {
     main_image: string
   }
   variant: {
-    sku: string
-    price: string
+    id: number
+    price: string | number
     stock: number
-    main_image: string | null
-    attribute_values: AttributeValue[]
+    attribute_values: AttributeValue[]  // unified — uses shared AttributeValue type
+    is_default?: boolean
   }
 }
 
@@ -111,4 +110,66 @@ export interface OrderItem {
 export interface CreateOrderRequest {
   customer_info: CustomerInfo
   items: OrderItem[]
+}
+
+// Order Tracking Types
+export enum OrderStatus {
+  Pending = 'pending',
+  Confirmed = 'confirmed',
+  Shipped = 'shipped',
+  Delivered = 'delivered',
+  Cancelled = 'cancelled',
+}
+
+export enum PaymentStatus {
+  Pending = 'pending',
+  Collected = 'collected',
+  Failed = 'failed',
+  Refunded = 'refunded',
+}
+
+export interface OrderCustomer {
+  first_name: string
+  last_name: string
+  phone_number: string
+  city: string
+  address: string
+  nearby_landmark?: string
+}
+
+export interface OrderPayment {
+  method: string
+  method_color: string
+  status: PaymentStatus | string
+  status_color: string
+  amount: number
+}
+
+export interface OrderItemDetail {
+  id: number
+  variant_id: number
+  sku: string
+  product_name: string
+  quantity: number
+  unit_price: number
+  attributes?: Record<string, string>
+  subtotal: number
+}
+
+export interface Order {
+  tracking_number: string
+  order_id: number
+  status: OrderStatus | string
+  status_color: string
+  total_price: number
+  customer: OrderCustomer
+  items: OrderItemDetail[]
+  payment: OrderPayment
+  created_at: string
+  updated_at: string
+}
+
+export interface OrderResponse {
+  message: string
+  data: Order
 }

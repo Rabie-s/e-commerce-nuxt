@@ -1,9 +1,8 @@
 <template>
-  <div class="min-h-screen bg-stone-50">
-    <Navbar />
-    <main class="pt-16">
+  <div>
+    <NuxtLayout>
       <NuxtPage />
-    </main>
+    </NuxtLayout>
   </div>
 </template>
 
