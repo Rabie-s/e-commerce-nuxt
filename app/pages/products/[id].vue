@@ -18,12 +18,7 @@ const { data: apiData, pending: loading } = await useFetch(() => `products/${rou
   key: `product-${route.params.id}`
 })
 
-// 2. Helper: Get full image URL
-const getImageUrl = (path: string) => {
-  if (!path) return ''
-  if (path.startsWith('http')) return path
-  return `${config.public.storage}${path}`
-}
+
 
 // 3. Compute and Transform Product Data
 const product = computed(() => {

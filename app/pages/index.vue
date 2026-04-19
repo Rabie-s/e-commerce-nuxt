@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { HomeProduct, HomeCategory } from '~/types'
+
 useHead({
   title: 'Gallery | Design for the everyday',
   link: [
@@ -11,65 +13,22 @@ useHead({
   ],
 })
 
+const config = useRuntimeConfig()
+
 const brands = ['METRO', 'AXEL', 'VANTAGE', 'PRISM', 'NOVA']
 
-const categories = [
-  {
-    id: 1,
-    name: 'Electronics',
-    subtitle: 'Next-generation technical gear.',
-    image: 'https://images.unsplash.com/photo-1544244015-0df4592c0494?q=80&w=800&auto=format&fit=crop',
-  },
-  {
-    id: 2,
-    name: 'Wearables',
-    subtitle: 'Precision crafted accessories.',
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=800&auto=format&fit=crop',
-  },
-  {
-    id: 3,
-    name: 'Home',
-    subtitle: 'Refined living essentials.',
-    image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=800&auto=format&fit=crop',
-  },
-  {
-    id: 4,
-    name: 'Accessories',
-    subtitle: 'Details that define.',
-    image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=800&auto=format&fit=crop',
-  },
-]
+// Fetch categories from API
+const { data: categoriesData } = await useFetch<{ data: HomeCategory[] }>('home/categories', {
+  baseURL: config.public.apiBase,
+  key: 'home-categories'
+})
 
-const products = [
-  {
-    id: 1,
-    name: 'Aura Sneakers',
-    category: 'Footwear',
-    price: '185',
-    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=600&auto=format&fit=crop',
-  },
-  {
-    id: 2,
-    name: 'Chronos Watch',
-    category: 'Wearables',
-    price: '420',
-    image: 'https://images.unsplash.com/photo-1548169874-53e85f753f1e?q=80&w=600&auto=format&fit=crop',
-  },
-  {
-    id: 3,
-    name: 'Sonic H1',
-    category: 'Audio',
-    price: '299',
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600&auto=format&fit=crop',
-  },
-  {
-    id: 4,
-    name: 'Pixel Pro X',
-    category: 'Electronics',
-    price: '899',
-    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600&auto=format&fit=crop',
-  },
-]
+// Fetch home products from API
+const { data } = await useFetch<{ data: HomeProduct[] }>('home/products', {
+  baseURL: config.public.apiBase,
+  key: 'home-products'
+})
+
 </script>
 
 <template>
@@ -156,59 +115,58 @@ const products = [
         <p class="text-[13px] text-[#191c1d]/45">Selected pieces for your collection.</p>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+      <div v-if="categoriesData?.data" class="grid grid-cols-1 lg:grid-cols-2 gap-3">
 
-        <!-- Large card: Electronics -->
+        <!-- Large card: First category -->
         <NuxtLink
-            to="/products?category=1"
+            :to="`/products?category=${categoriesData.data[0].id}`"
             class="group relative rounded-2xl overflow-hidden block bg-[#e8e9eb] min-h-[480px]"
         >
           <img
-              :src="categories[0].image"
-              :alt="categories[0].name"
+              :src="getImageUrl(categoriesData.data[0].main_image)"
+              :alt="categoriesData.data[0].name"
               class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-700 ease-out"
           />
           <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
           <div class="absolute bottom-0 left-0 right-0 p-5">
             <span class="block text-[17px] font-semibold text-white tracking-[-0.01em] mb-1" style="font-family: 'Manrope', sans-serif;">
-              {{ categories[0].name }}
+              {{ categoriesData.data[0].name }}
             </span>
-            <span class="block text-[11px] text-white/60">{{ categories[0].subtitle }}</span>
           </div>
         </NuxtLink>
 
-        <!-- Right column: 3 cards -->
+        <!-- Right column: remaining cards -->
         <div class="grid grid-cols-2 gap-3">
 
-          <!-- Wearables — spans 2 cols -->
+          <!-- Second category — spans 2 cols -->
           <NuxtLink
-              to="/products?category=2"
+              v-if="categoriesData.data[1]"
+              :to="`/products?category=${categoriesData.data[1].id}`"
               class="group relative rounded-2xl overflow-hidden col-span-2 block bg-[#e8e9eb]"
               style="aspect-ratio: 16/7;"
           >
             <img
-                :src="categories[1].image"
-                :alt="categories[1].name"
+                :src="getImageUrl(categoriesData.data[1].main_image)"
+                :alt="categoriesData.data[1].name"
                 class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-700 ease-out"
             />
             <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
             <div class="absolute bottom-0 left-0 right-0 p-5">
               <span class="block text-[16px] font-semibold text-white tracking-[-0.01em] mb-0.5" style="font-family: 'Manrope', sans-serif;">
-                {{ categories[1].name }}
+                {{ categoriesData.data[1].name }}
               </span>
-              <span class="block text-[11px] text-white/60">{{ categories[1].subtitle }}</span>
             </div>
           </NuxtLink>
 
-          <!-- Home & Accessories -->
+          <!-- Third & Fourth categories -->
           <NuxtLink
-              v-for="cat in categories.slice(2, 4)"
+              v-for="cat in categoriesData.data.slice(2, 4)"
               :key="cat.id"
               :to="`/products?category=${cat.id}`"
               class="group relative rounded-2xl overflow-hidden aspect-square block bg-[#e8e9eb]"
           >
             <img
-                :src="cat.image"
+                :src="getImageUrl(cat.main_image)"
                 :alt="cat.name"
                 class="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-700 ease-out"
             />
@@ -217,7 +175,6 @@ const products = [
               <span class="block text-[15px] font-semibold text-white tracking-[-0.01em] mb-0.5" style="font-family: 'Manrope', sans-serif;">
                 {{ cat.name }}
               </span>
-              <span class="block text-[10px] text-white/60">{{ cat.subtitle }}</span>
             </div>
           </NuxtLink>
 
@@ -251,7 +208,7 @@ const products = [
         <!-- Updated to use UiFeaturedProductCard -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <UiFeaturedProductCard
-              v-for="product in products"
+              v-for="product in data?.data"
               :key="product.id"
               :product="product"
           />

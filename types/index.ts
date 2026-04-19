@@ -47,6 +47,20 @@ export interface Brand {
   name: string
 }
 
+// Home Product Types (simplified for homepage API response)
+export interface HomeProduct {
+  id: number
+  name: string
+  price: string | number | null
+  main_image: string | null
+}
+
+export interface HomeCategory {
+  id: number
+  name: string
+  main_image: string
+}
+
 export interface CartItem {
   variant_id: number
   quantity: number

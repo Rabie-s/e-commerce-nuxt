@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CartItem } from '~/types'
+import {getImageUrl} from "~/utils";
 
 const cartStore = useCartStore()
 const router = useRouter()
@@ -29,10 +30,6 @@ const getVariantName = (item: CartItem): string => {
   return item.variant.attribute_values.map(av => av.value).join(' / ')
 }
 
-// Get product image — image always lives on product, never on variant
-const getProductImage = (item: CartItem): string => {
-  return item.product.main_image || 'https://via.placeholder.com/150'
-}
 
 // Update quantity
 const handleUpdateQuantity = (variantId: number, newQuantity: number) => {
@@ -120,7 +117,7 @@ useHead({
             <!-- Product Image -->
             <NuxtLink :to="`/products/${item.product.id}`" class="block w-28 h-28 flex-shrink-0 rounded-xl overflow-hidden bg-[#f3f4f5]">
               <img
-                  :src="getProductImage(item)"
+                  :src="getImageUrl(item.product.main_image)"
                   :alt="item.product.name"
                   class="w-full h-full object-cover"
                   loading="lazy"

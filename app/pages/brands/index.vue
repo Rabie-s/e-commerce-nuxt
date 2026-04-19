@@ -17,11 +17,6 @@ const { data: brandsData } = await useFetch<Brand[]>('/brands', {
 
 const brands = computed(() => brandsData.value || [])
 
-// Helper to handle Image URLs (Relative vs Absolute)
-const getImageUrl = (path: string | null) => {
-  if (!path) return ''
-  return `${config.public.storage}${path}`
-}
 
 useHead({
   title: 'Designers | Gallery Luxe'

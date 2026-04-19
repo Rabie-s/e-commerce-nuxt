@@ -17,15 +17,6 @@ const { data: categoriesData } = await useFetch<Category[]>('/categories/', {
 
 const categories = computed(() => categoriesData.value || [])
 
-// Helper to handle Image URLs (Relative vs Absolute)
-const getImageUrl = (path: string | null) => {
-  if (!path) return 'https://via.placeholder.com/600x800?text=No+Image'
-  if (path.startsWith('http')) return path
-  // Construct URL using storage base or API base
-  // Assuming your previous pattern: config.public.storage or apiBase
-  return `${config.public.storage || config.public.apiBase.replace('/api/v1', '')}/${path}`
-}
-
 
 useHead({
   title: 'Collections | Gallery Luxe'

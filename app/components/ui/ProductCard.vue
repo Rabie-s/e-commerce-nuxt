@@ -2,11 +2,11 @@
 <script setup lang="ts">
 import type { Product } from '~/types'
 
+
 const props = defineProps<{
   product: Product
 }>()
 
-const config = useRuntimeConfig()
 const cartStore = useCartStore()
 
 // State
@@ -21,9 +21,7 @@ const defaultVariant = computed(() => {
 // Helper to get resolved image URL
 const mainImage = computed(() => {
   const path = props.product.main_image
-  if (!path) return 'https://via.placeholder.com/400'
-  if (path.startsWith('http')) return path
-  return `${config.public.storage}${path}`
+  return getImageUrl(path)
 })
 
 // Helper to get price

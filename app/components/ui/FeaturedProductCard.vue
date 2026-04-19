@@ -1,25 +1,35 @@
 <script setup lang="ts">
-export interface FeaturedProduct {
-  id: number
-  name: string
-  category: string
-  price: string | number
-  image: string
-}
+import type { HomeProduct } from '~/types'
 
-defineProps<{
-  product: FeaturedProduct
+const props = defineProps<{
+  product: HomeProduct
 }>()
+
+const config = useRuntimeConfig()
+
+// Get full image URL
+const imageUrl = computed(() => {
+  if (!props.product.main_image) return 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600&auto=format&fit=crop'
+  if (props.product.main_image.startsWith('http')) return props.product.main_image
+  return `${config.public.storage}${props.product.main_image}`
+})
+
+// Format price
+const formattedPrice = computed(() => {
+  if (props.product.price === null || props.product.price === undefined) return '0'
+  const numPrice = typeof props.product.price === 'string' ? parseFloat(props.product.price) : props.product.price
+  return numPrice.toFixed(0)
+})
 </script>
 
 <template>
   <NuxtLink
-      :to="`/product/${product.id}`"
+      :to="`/products/${product.id}`"
       class="group block hover:-translate-y-1 transition-transform duration-200"
   >
     <div class="bg-white rounded-2xl overflow-hidden aspect-square mb-3">
       <img
-          :src="product.image"
+          :src="imageUrl"
           :alt="product.name"
           class="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-500 ease-out"
       />
@@ -33,15 +43,12 @@ defineProps<{
         >
           {{ product.name }}
         </p>
-        <p class="text-[11px] font-medium text-[#191c1d]/40">
-          {{ product.category }}
-        </p>
       </div>
       <p
           class="text-[14px] font-semibold text-[#191c1d] shrink-0"
           style="font-family: 'Manrope', sans-serif;"
       >
-        ${{ product.price }}
+        ${{ formattedPrice }}
       </p>
     </div>
   </NuxtLink>
