@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { Order, OrderResponse, OrderStatus, PaymentStatus } from '~/types'
-
+import type { OrderResponse } from '~/types'
 const route = useRoute()
 const config = useRuntimeConfig()
 
@@ -13,61 +12,6 @@ const { data: orderData, pending: loading, error: fetchError } = await useFetch<
 
 const order = computed(() => orderData.value?.data ?? null)
 
-const formatDate = (dateStr: string): string => {
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(new Date(dateStr))
-}
-
-const formatPrice = (price: string | number): string => {
-  const num = typeof price === 'string' ? parseFloat(price) : price
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'JOD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(num)
-}
-
-// Removed: Order status steps logic moved to OrderStatusTracker component
-
-const getStatusBadgeClasses = () => {
-  if (!order.value) return ''
-  const color = order.value.status_color
-  switch (color) {
-    case 'success':
-      return 'bg-green-100 text-green-700'
-    case 'danger':
-    case 'error':
-      return 'bg-red-100 text-red-700'
-    case 'warning':
-      return 'bg-orange-100 text-orange-700'
-    case 'info':
-      return 'bg-blue-100 text-blue-700'
-    default:
-      return 'bg-gray-100 text-gray-700'
-  }
-}
-
-const getPaymentStatusClasses = () => {
-  if (!order.value) return ''
-  const color = order.value.payment?.status_color
-  switch (color) {
-    case 'success':
-      return 'bg-green-100 text-green-700'
-    case 'danger':
-    case 'error':
-      return 'bg-red-100 text-red-700'
-    case 'warning':
-      return 'bg-orange-100 text-orange-700'
-    case 'info':
-      return 'bg-blue-100 text-blue-700'
-    default:
-      return 'bg-gray-100 text-gray-600'
-  }
-}
 
 useHead({
   title: () => order.value ? `Order Tracking - ${order.value.tracking_number}` : 'Tracking Order',
@@ -117,12 +61,12 @@ useHead({
               {{ order.tracking_number }}
             </h1>
             <p class="text-sm text-gray-600">
-              Created at {{ formatDate(order.created_at) }} • <span class="font-medium text-black capitalize">{{ order.status }}</span>
+              Created at {{ order.created_at }} • <span class="font-medium text-black capitalize">{{ order.status }}</span>
             </p>
           </div>
           <div
             class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-wide"
-            :class="getStatusBadgeClasses()"
+            :class="getStatusClasses(order.status_color)"
           >
             <span class="w-2 h-2 rounded-full bg-current"></span>
             {{ order.status }}
@@ -199,7 +143,7 @@ useHead({
                 <span class="text-gray-600">Status</span>
                 <span
                   class="px-3 py-1 rounded-full text-xs font-semibold uppercase"
-                  :class="getPaymentStatusClasses()"
+                  :class="getStatusClasses(order.payment.status_color)"
                 >
                   {{ order.payment.status }}
                 </span>

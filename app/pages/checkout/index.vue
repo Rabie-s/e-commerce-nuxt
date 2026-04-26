@@ -31,13 +31,6 @@ const isEmpty = computed(() => cartItems.value.length === 0)
 const API_BASE = 'http://e-commerce-laravel.test'
 
 // Format price
-const formatPrice = (price: string | number): string => {
-  const numPrice = typeof price === 'string' ? parseFloat(price) : price
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD'
-  }).format(numPrice)
-}
 
 // Validate form
 const validateForm = (): boolean => {
@@ -100,7 +93,7 @@ const submitOrder = async () => {
     orderSuccess.value = true
 
     setTimeout(() => {
-      router.push(`/orders/${result.order_uuid}`)
+      router.push(`/orders/${result.tracking_number}`)
     }, 1500)
   } catch (error) {
     console.error('Order submission error:', error)

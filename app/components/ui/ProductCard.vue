@@ -1,6 +1,7 @@
 <!-- components/ui/ProductCard.vue -->
 <script setup lang="ts">
 import type { Product } from '~/types'
+const { getImageUrl } = useImageUrl()
 
 
 const props = defineProps<{

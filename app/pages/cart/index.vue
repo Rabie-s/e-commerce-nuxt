@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CartItem } from '~/types'
-import {getImageUrl} from "~/utils";
+const { getImageUrl } = useImageUrl()
+
 
 const cartStore = useCartStore()
 const router = useRouter()
@@ -14,15 +15,6 @@ const isEmpty = computed(() => cartItems.value.length === 0)
 // State
 const updatingQuantity = ref<number | null>(null)
 const removingItem = ref<number | null>(null)
-
-// Format price
-const formatPrice = (price: string | number): string => {
-  const numPrice = typeof price === 'string' ? parseFloat(price) : price
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD'
-  }).format(numPrice)
-}
 
 // Get variant display name — guards against missing attribute_values
 const getVariantName = (item: CartItem): string => {

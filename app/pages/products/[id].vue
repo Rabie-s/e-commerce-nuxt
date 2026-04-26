@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { Product, ProductVariant } from '~/types'
+const { getImageUrl } = useImageUrl()
+
 import ProductGallery from '~/components/ui/ProductGallery.vue'
 import UiButton from '~/components/ui/Button.vue'
 
@@ -18,9 +20,7 @@ const { data: apiData, pending: loading } = await useFetch(() => `products/${rou
   key: `product-${route.params.id}`
 })
 
-
-
-// 3. Compute and Transform Product Data
+// 4. Compute and Transform Product Data
 const product = computed(() => {
   if (!apiData.value?.data) return null
   const data = apiData.value.data as Product
@@ -28,14 +28,27 @@ const product = computed(() => {
   return {
     ...data,
     main_image: getImageUrl(data.main_image),
-    images: data.images.map(img => ({
-      ...img,
-      path: getImageUrl(img.path)
+    variants: data.variants.map(variant => ({
+      ...variant,
+      main_image: getImageUrl(variant.main_image),
+      images: variant.images.map(img => ({
+        ...img,
+        path: getImageUrl(img.path)
+      }))
     }))
   }
 })
 
-// 4. Initialize Default Variant
+// 5. Gallery Images (from selected variant, fallback to product main_image)
+const galleryImages = computed(() => {
+  if (selectedVariant.value?.images?.length) {
+    return selectedVariant.value.images.map(img => img.path)
+  }
+  // Fallback to product main_image as single-image array
+  return product.value?.main_image ? [product.value.main_image] : []
+})
+
+// 6. Initialize Default Variant
 watch(product, (newProduct) => {
   if (newProduct?.variants.length && !selectedVariant.value) {
     const defaultVariant = newProduct.variants.find(v => v.is_default) || newProduct.variants[0]
@@ -43,16 +56,8 @@ watch(product, (newProduct) => {
   }
 }, { immediate: true })
 
-// 5. Helper: Format Price
-const formatPrice = (price: string | number): string => {
-  const numPrice = typeof price === 'string' ? parseFloat(price) : price
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD'
-  }).format(numPrice)
-}
 
-// 6. Helper: Format Variant Label (e.g., "Color: Black")
+// 8. Helper: Format Variant Label (e.g., "Color: Black")
 const getVariantLabel = (variant: ProductVariant) => {
   if (!variant.attribute_values?.length) return `Variant #${variant.id}`
   return variant.attribute_values
@@ -60,7 +65,7 @@ const getVariantLabel = (variant: ProductVariant) => {
       .join(' / ')
 }
 
-// 7. Actions
+// 9. Actions
 const selectVariant = (variant: ProductVariant) => {
   selectedVariant.value = variant
   quantity.value = 1
@@ -126,7 +131,7 @@ useHead({
         <!-- Left: Image Gallery -->
         <div class="w-full aspect-square sticky top-28 flex items-center justify-center rounded-3xl bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
           <ProductGallery
-              :images="product.images.map(img => img.path)"
+              :images="galleryImages"
               :alt="product.name"
           />
         </div>

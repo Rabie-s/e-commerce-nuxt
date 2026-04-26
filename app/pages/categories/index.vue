@@ -6,6 +6,8 @@ interface Category {
   main_image: string | null
   slug?: string
 }
+const { getImageUrl } = useImageUrl()
+
 
 const config = useRuntimeConfig()
 

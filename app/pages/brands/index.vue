@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { getImageUrl } = useImageUrl()
+
 interface Brand {
   id: number
   name: string

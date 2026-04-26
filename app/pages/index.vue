@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { HomeProduct, HomeCategory } from '~/types'
-
+const { getImageUrl } = useImageUrl()
 useHead({
   title: 'Gallery | Design for the everyday',
   link: [

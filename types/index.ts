@@ -6,7 +6,6 @@ export interface Product {
   description: string
   status: boolean
   main_image: string
-  images: ProductImage[]
   category: { id: number; name: string }
   brand: { id: number; name: string }
   default_variant?: ProductVariant
@@ -26,7 +25,9 @@ export interface ProductVariant {
   price: string
   is_default: boolean
   stock: number
-  attribute_values: AttributeValue[]  // removed main_image — image belongs to product only
+  main_image: string
+  images: ProductImage[]
+  attribute_values: AttributeValue[]
 }
 
 export interface AttributeValue {
